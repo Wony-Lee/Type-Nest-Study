@@ -8,17 +8,60 @@ app.use((req, res, next) => {
     console.log("test middleware");
     next();
 });
-app.get("/", (req, res) => {
-    console.log(req.rawHeaders[1]);
-    res.send({ cats: app_model_1.Cat });
+app.use(express.json());
+app.get("/cats", (req, res) => {
+    try {
+        const cats = app_model_1.Cat;
+        res.status(200).send({
+            success: true,
+            data: {
+                cats,
+            },
+        });
+    }
+    catch (err) {
+        res.status(400).send({
+            success: false,
+            error: err.message,
+        });
+    }
 });
-app.get("/cats/blue", (req, res) => {
-    console.log(req.rawHeaders[1]);
-    res.send({ cats: app_model_1.Cat[0] });
+app.get("/cats/:id", (req, res) => {
+    try {
+        const params = req.params;
+        const cat = app_model_1.Cat.find((cat) => {
+            return cat.id === params.id;
+        });
+        res.status(200).send({
+            success: true,
+            data: {
+                cat,
+            },
+        });
+    }
+    catch (err) {
+        res.status(400).send({
+            success: false,
+            error: err.message,
+        });
+    }
 });
-app.get("/cats/som", (req, res) => {
-    console.log(req.rawHeaders[1]);
-    res.send({ som: app_model_1.Cat[1] });
+app.post("/cats", (req, res) => {
+    try {
+        const data = req.body;
+        console.log(data);
+        app_model_1.Cat.push(data);
+        res.status(200).send({
+            success: true,
+            data: { data },
+        });
+    }
+    catch (err) {
+        res.status(400).send({
+            success: false,
+            error: err.message,
+        });
+    }
 });
 app.use((req, res, next) => {
     console.log("this is test middleware");
